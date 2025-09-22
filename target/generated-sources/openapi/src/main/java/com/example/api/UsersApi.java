@@ -6,6 +6,7 @@
 package com.example.api;
 
 import com.example.model.CreateUserRequest;
+import com.example.model.HealthResponse;
 import com.example.model.UpdateUserRequest;
 import com.example.model.User;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-21T21:04:42.587355-04:00[America/New_York]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-21T22:38:07.474312-04:00[America/New_York]")
 @Validated
 @Tag(name = "Users", description = "the Users API")
 public interface UsersApi {
@@ -90,6 +91,31 @@ public interface UsersApi {
     )
     ResponseEntity<Void> deleteUser(
         @Parameter(name = "userId", description = "", required = true, in = ParameterIn.PATH) @PathVariable("userId") Long userId
+    );
+
+
+    /**
+     * GET /health : Check API health
+     *
+     * @return API is healthy (status code 200)
+     */
+    @Operation(
+        operationId = "getHealth",
+        summary = "Check API health",
+        tags = { "Users" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "API is healthy", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = HealthResponse.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/health",
+        produces = { "application/json" }
+    )
+    ResponseEntity<HealthResponse> getHealth(
+        
     );
 
 

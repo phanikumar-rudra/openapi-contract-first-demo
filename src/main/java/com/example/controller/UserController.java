@@ -2,11 +2,11 @@ package com.example.controller;
 
 import com.example.api.UsersApi;
 import com.example.model.CreateUserRequest;
+import com.example.model.HealthResponse;
 import com.example.model.UpdateUserRequest;
 import com.example.model.User;
 import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,4 +45,11 @@ public class UserController implements UsersApi {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<HealthResponse> getHealth() {
+        return ResponseEntity.ok(new HealthResponse().status("Application Up and Running..."));
+    }
+
+
 }

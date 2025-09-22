@@ -5,10 +5,27 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: http://localhost:8080/{basePath}
     description: Development server
-
+    variables:
+      basePath:
+        default: openapi-contract-first-demo
+        description: Base path of the API
 paths:
+  /health:
+    get:
+      tags:
+        - Users
+      operationId: getHealth
+      summary: Check API health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
   /users:
     get:
       tags:
@@ -160,3 +177,10 @@ components:
         email:
           type: string
           format: email
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "OK"
