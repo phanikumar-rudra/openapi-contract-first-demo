@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!--
+        Spring Boot Parent POM
+        - Provides dependency management for Spring Boot and related libraries
+        - Manages versions of common dependencies to ensure compatibility
+        - Includes default plugin configurations for building Spring Boot applications
+        - Version 3.5.6 is the latest stable release at the time of this project
+    -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.6</version>
+		<relativePath/>
+	</parent>
+
+	<!-- Project coordinates -->
+	<groupId>com.example</groupId>
+	<artifactId>openapi-contract-first</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>openapi-contract-first</name>
+	<description>OpenAPI Contract-First Spring Boot Application</description>
+
+	<properties>
+		<!--
+            Java 17 - Minimum LTS version required for Spring Boot 3.x
+            Spring Boot 3.x requires Java 17 or higher
+        -->
+		<java.version>17</java.version>
+
+		<!--
+            Maven compiler configuration
+            Ensures source and target compatibility with Java 17
+        -->
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+
+		<!-- Project encoding to ensure consistent character handling across environments -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!--
+            OpenAPI Generator Maven Plugin version
+            Used to generate API interfaces and model classes from OpenAPI specification
+            Version 7.0.1 is stable and provides full Spring Boot 3.x support with Jakarta EE
+        -->
+		<openapi-generator.version>7.0.1</openapi-generator.version>
+
+		<!--
+            Springdoc OpenAPI version
+            Provides automatic OpenAPI documentation generation and Swagger UI
+            Version 2.7.0 is fully compatible with Spring Boot 3.x
+        -->
+		<springdoc-openapi.version>2.7.0</springdoc-openapi.version>
+
+		<!--
+            Jackson Databind Nullable version
+            Required by OpenAPI Generator for proper null handling in generated models
+        -->
+		<jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+	</properties>
+
+	<dependencies>
+		<!--
+            Spring Boot Web Starter
+            - Includes Spring MVC for building REST APIs
+            - Embedded Tomcat server for running the application
+            - JSON support via Jackson for request/response serialization
+            - Auto-configuration for web applications
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!--
+            Spring Boot Validation Starter
+            - Bean Validation (JSR-380) support using Hibernate Validator
+            - Enables @Valid, @NotNull, @Size, @Email annotations in request/response models
+            - Automatically validates incoming request payloads
+            - Essential for enforcing constraints defined in OpenAPI schema
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<!--
+            Springdoc OpenAPI UI
+            - Automatically generates OpenAPI 3.0 documentation from your code
+            - Provides interactive Swagger UI at /swagger-ui.html
+            - Exposes OpenAPI JSON/YAML at /v3/api-docs
+            - Integrates seamlessly with Spring Boot and generated API interfaces
+            - Allows testing APIs directly from the browser
+        -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc-openapi.version}</version>
+		</dependency>
+
+		<!--
+            Jackson Databind Nullable
+            - Provides JsonNullable<T> wrapper class for optional fields
+            - Used by OpenAPI Generator to distinguish between null and absent values
+            - Allows proper PATCH operations where only provided fields are updated
+            - Essential for generated model classes that need to handle partial updates
+        -->
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>${jackson-databind-nullable.version}</version>
+		</dependency>
+
+		<!--
+            Lombok
+            - Reduces boilerplate code with annotations
+            - @Data, @Getter, @Setter, @Builder, @NoArgsConstructor, @AllArgsConstructor
+            - @RequiredArgsConstructor for dependency injection
+            - @Slf4j for logging
+            - Optional dependency, not included in final JAR
+            - Processes annotations at compile-time, no runtime overhead
+        -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!--
+            Spring Boot Starter Test
+            - JUnit 5 (Jupiter) for unit testing
+            - Mockito for mocking dependencies
+            - AssertJ for fluent assertions
+            - Spring Test & Spring Boot Test utilities
+            - MockMvc for testing REST controllers
+            - Test scope only - not included in production builds
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!--
+        Plugin Repositories
+        Ensures Maven can find the OpenAPI Generator plugin
+        Maven Central is the default repository for plugins
+    -->
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<!--
+                Spring Boot Maven Plugin
+                - Packages the application as an executable JAR with embedded server
+                - Provides spring-boot:run goal for running the app during development
+                - Handles repackaging to include all dependencies
+                - Enables layered JAR creation for optimized Docker images
+            -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!--
+                        Exclude Lombok from the final JAR
+                        Lombok is only needed at compile-time
+                    -->
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<!--
+                OpenAPI Generator Maven Plugin
+                - Generates Java code from OpenAPI specification
+                - Creates API interfaces, model classes, and supporting utilities
+                - Runs during the generate-sources phase (before compilation)
+                - Ensures implementation stays in sync with API contract
+            -->
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>${openapi-generator.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<!--
+                                Input OpenAPI specification file location
+                                Contract-first approach: API design comes before implementation
+                            -->
+							<inputSpec>${project.basedir}/src/main/resources/openapi/api.yaml</inputSpec>
+
+							<!--
+                                Generator name: 'spring'
+                                Generates Spring Boot compatible code with Spring annotations
+                            -->
+							<generatorName>spring</generatorName>
+
+							<!--
+                                Package names for generated code
+                                apiPackage: Contains REST controller interfaces
+                                modelPackage: Contains request/response POJOs
+                            -->
+							<apiPackage>com.example.api</apiPackage>
+							<modelPackage>com.example.model</modelPackage>
+
+							<!--
+                                Generate only essential supporting files
+                                ApiUtil.java provides helper methods for ResponseEntity handling
+                            -->
+							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+
+							<configOptions>
+
+								<operationIdNaming>original</operationIdNaming>
+								<!--
+                                    delegatePattern: true
+                                    Generates API interfaces that can be implemented as delegates
+                                    Separates generated interfaces from business logic implementation
+                                    Allows clean separation of concerns
+
+								<delegatePattern>true</delegatePattern>-->
+
+								<!--
+                                    useSpringBoot3: true
+                                    Ensures generated code is compatible with Spring Boot 3.x features
+                                    Uses modern Spring annotations and patterns
+
+								<useSpringBoot3>true</useSpringBoot3>-->
+
+								<!--
+                                    interfaceOnly: true
+                                    Generates only interfaces, not implementation classes
+                                    You provide the implementation by implementing generated interfaces
+                                    Prevents overwriting your custom business logic
+
+								<interfaceOnly>true</interfaceOnly>-->
+
+								<!--
+                                    skipDefaultInterface: true
+                                    Skips generating default interface methods
+                                    Forces you to implement all API methods explicitly
+                                    Provides better IDE support and cleaner code
+
+								<skipDefaultInterface>true</skipDefaultInterface>-->
+
+								<!--
+                                    useTags: true
+                                    Uses OpenAPI tags to organize generated API interfaces
+                                    Creates separate interface per tag for better organization
+                                    Aligns with OpenAPI best practices
+
+								<useTags>true</useTags>-->
+
+								<!--
+                                    dateLibrary: java8
+                                    Uses Java 8+ date/time API (LocalDate, LocalDateTime, OffsetDateTime)
+                                    Modern, thread-safe date handling
+                                    Replaces legacy java.util.Date
+
+								<dateLibrary>java8</dateLibrary> -->
+
+								<!--
+                                    useJakartaEe: true
+                                    Uses Jakarta EE annotations instead of javax.* packages
+                                    Required for Spring Boot 3.x which migrated to Jakarta EE
+                                    Ensures compatibility with Jakarta Validation, Servlet API, etc.
+
+								<useJakartaEe>true</useJakartaEe>-->
+								<!--
+									useBeanValidation: true
+									Adds Bean Validation annotations (@NotNull, @Size, etc.) to models
+									Enables automatic request validation in Spring controllers
+									Ensures data integrity as per OpenAPI schema constraints
+								-->
+								<useBeanValidation>true</useBeanValidation>
+								<openApiNullable>false</openApiNullable>
+								<interfaceOnly>true</interfaceOnly>
+								<skipDefaultInterface>true</skipDefaultInterface>
+								<useTags>true</useTags>
+								<useSpringBoot3>true</useSpringBoot3>
+								<operationIdNaming>method</operationIdNaming>
+
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
